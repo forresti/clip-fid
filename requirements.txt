@@ -1,3 +1,5 @@
 diffusers
 pandas
 unicode-slugify
+torchmetrics
+torchmetrics[image]

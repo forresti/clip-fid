@@ -14,7 +14,7 @@ TODO:
 4. run model on captions and save the output
 
 """
-
+import argparse
 from datetime import datetime as dt
 import json
 from slugify import slugify
@@ -22,6 +22,11 @@ import os
 from PIL import Image
 import torch
 from diffusers import StableDiffusionPipeline
+
+def get_parser():
+   parser = argparse.ArgumentParser()
+   # TODO: add args
+   return parser
 
 def get_output_dir():
    datetime_format = '%Y-%m-%d_%H.%M.%S.%f'
@@ -32,10 +37,9 @@ def get_output_dir():
    return out_dir
 
 def get_caption_out_fname(output_dir, annotation):
-   out_fname = f"{annotation['id']}_{slugify(annotation['caption'])}.jpg"
+   out_fname = f"{annotation['image_id']}_{slugify(annotation['caption'])}.jpg"
    out_fname = os.path.join(output_dir, out_fname)
    return out_fname
-
 
 def get_pipe():
    pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16, revision="fp16")
@@ -54,6 +58,8 @@ def main():
    pipe = get_pipe()
    captions = get_captions()
 
+   out_pointers = []
+
    for anno in captions[0:10]:
 
       # TODO: do I need to reset the model memory or anything?
@@ -64,7 +70,14 @@ def main():
 
       img.save(out_fname)
 
+      out_pointers.append({
+         'image_id': anno['image_id'],
+         'caption': anno['caption'],
+         'generated_image': os.path.basename(out_fname),
+      })
 
+   with open(os.path.join(out_dir, 'generated.json'), 'w') as f:
+      json.dump(out_pointers, f)
 
 
 if __name__ == "__main__":
