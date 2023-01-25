@@ -1,19 +1,4 @@
-"""
-TODO:
 
-1. load hugging face model
-2. load list of captions
-3. decide where to save output
-   3.1. data format...
-        outputs/<datetime>_<args>/
-                                  captions.txt # do I need this?
-                                  images/
-                                         00000_<caption>.jpg
-                                         00001_<caption>.jpg
-
-4. run model on captions and save the output
-
-"""
 import argparse
 from datetime import datetime as dt
 import json
@@ -60,7 +45,7 @@ def main():
 
    out_pointers = []
 
-   for anno in captions[0:10]:
+   for i,anno in enumerate(captions[0:20000]):
 
       # TODO: do I need to reset the model memory or anything?
       model_output = pipe(prompt=anno['caption'], num_images_per_prompt=1)
@@ -75,6 +60,10 @@ def main():
          'caption': anno['caption'],
          'generated_image': os.path.basename(out_fname),
       })
+
+      if i%100 == 0:
+         with open(os.path.join(out_dir, f'generated_ckpt_{i}.json'), 'w') as f:
+            json.dump(out_pointers, f)
 
    with open(os.path.join(out_dir, 'generated.json'), 'w') as f:
       json.dump(out_pointers, f)
