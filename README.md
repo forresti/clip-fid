@@ -25,5 +25,5 @@ python ./scripts/generate_images.py  # this will run LDM-v1.5 on 20,000 coco cap
 cd notebooks
 jupyter notebook
 open clip_score_demo.ipynb
-Run the notebook
+Run the notebook (and update `generated_dir` to the directory produced by generate_images.py)
 It will give you CLIP and FID scores.
